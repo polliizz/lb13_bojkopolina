@@ -1,0 +1,56 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+using namespace std;
+class Discountable {
+public:
+virtual double applyDiscount(double price) const = 0;
+virtual ~Discountable() {}
+};
+class Product {
+protected:
+string name;
+double price;
+public:
+Product(const string& name, double price) : name(name), price(price) {}
+virtual ~Product() {}
+string getName() const { return name; }
+void setName(const string& name) { this->name = name; }
+double getPrice() const { return price; }
+void setPrice(double price) { this->price = price; }
+virtual double getFinalPrice() const = 0;
+};
+class Book : public Product, public Discountable {
+public:
+Book(const string& name, double price) : Product(name, price) {}
+double applyDiscount(double price) const override {
+return price * 0.5;
+    }
+double getFinalPrice() const override {
+return applyDiscount(price);
+    }
+};
+class Pensil : public Product, public Discountable {
+public:
+Pensil(const string& name, double price) : Product(name, price) {}
+double applyDiscount(double price) const override {
+return (price > 7) ? (price - 7) : price;
+    }
+double getFinalPrice() const override {
+return applyDiscount(price);
+    }
+};
+int main() {
+vector<shared_ptr<Product>> products;
+products.push_back(make_shared<Book>("Маленькі жінки", 500.0));
+products.push_back(make_shared<Book>("13 хвилин", 450.0));
+products.push_back(make_shared<Pensil>("Звичайний карандаш", 10.0));
+cout << "Список товарів:\n";
+for (const auto& product : products) {
+cout << "Назва: " << product->getName()
+<< ", Базова ціна: " << product->getPrice()
+<< ", Кінцева ціна: " << product->getFinalPrice() << " грн\n";
+    }
+return 0;
+}
